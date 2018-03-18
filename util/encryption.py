@@ -3,29 +3,28 @@ import os.path
 
 # documentation - https://cryptography.io/en/latest/fernet/
 
-def encrypt(string):
-    return f(privkey()).encrypt(string.encode('utf-8')).decode('utf-8')
+class CryptoFernet:
+    def __init__(self):
+        path = '.privatekey'
 
-def decrypt(token):
-    try:
-        result = f(privkey()).decrypt(token.encode("utf-8")).decode('utf-8')
-    except:
-        result = None        
-        print("Invalid token or string cannot be decrypted through private key!")
+        if not os.path.isfile(path):
+            self.pk = f.generate_key().decode('utf-8')
+            
+            file = open(path,"w") 
+            file.write(self.pk)
+            file.close()
+        else:
+            with open(path, 'rb') as secret:
+                self.pk = secret.read()
 
-    return result
+    def encrypt(self, string):
+        return f(self.pk).encrypt(string.encode('utf-8')).decode('utf-8')
 
-def privkey():
-    path = '.privatekey'
+    def decrypt(self, token):
+        try:
+            result = f(self.pk).decrypt(token.encode("utf-8")).decode('utf-8')
+        except:
+            result = None        
+            print("Invalid token or string cannot be decrypted through private key!")
 
-    if not os.path.isfile(path):
-        pk = f.generate_key().decode('utf-8')
-        
-        file = open(path,"w") 
-        file.write(pk)
-        file.close()
-    else:
-        with open(path, 'rb') as secret:
-            pk = secret.read()
-    
-    return pk
+        return result

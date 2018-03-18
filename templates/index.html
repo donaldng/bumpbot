@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+<title>LYN Bump Bot</title>
+
+<section class="hero is-info">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">
+                LYN Bump Bot
+            </h1>
+
+            <h2 class="subtitle">
+                Bump your lowyat.net post for free!
+            </h2>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="notification is-info" id="banner">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>            
+            {% endif %}
+        {% endwith %}
+        <div class="columns">
+            <div class="column">
+                <div class="content">
+                    <blockquote>
+                        This is a micro webservice which helps you to bump your lowyat.net post.
+                        <br/>
+                        Life is hard and time is short. Let bump bot do the job for you.
+                    </blockquote>
+                </div>
+
+                <div class="content">
+                    <h2>How this works?</h2>
+                    <ol>
+                        <li>Enter your LYN Username, and we send a password to your LYN inbox.</li>
+                        <li>Login and add url to the post you want to <b>bump</b>.</li>
+                        <li>????</li>
+                        <li>PROFIT!</li>
+                    </ol>
+                </div>
+
+                <form method="POST" action="/register">
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <input class="input" type="text" name="register_username" placeholder="Lowyat.net username" />
+                        </div>
+                        <div class="control">
+                            <input class="button is-info" type="submit" name="submit" value="Sign up" />        
+                        </div>
+                    </div>
+                </form>   
+            </div>
+            <div class="column">
+                <div class="content">
+                    <div class="box">
+                    
+                        <h2>Login</h2>
+                        <form method="POST" action="/login">
+                            <div class="field">
+                                <div class="control">
+                                    <input class="input" type="text" name="username" placeholder="Username" />
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control">
+                                    <input class="input" type="password" name="password" placeholder="Password" />
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control">
+                                    <input class="button is-info" type="submit" name="submit" value="Login" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div> 
+        </div>
+
+    </div>
+</section>
+
+<script>
+    setTimeout(function(){
+        $('#banner').hide();
+    }, 3000);
+</script>

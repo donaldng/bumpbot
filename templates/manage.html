@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+<title>LYN Bump Bot</title>
+
+<section class="hero is-info">
+    <div class="hero-head">
+        <div class="container">
+            <div class="is-paddingless">
+                <nav class="navbar">
+                    <div class="navbar-brand">
+                        <div class="navbar-item">
+                            <h1 class="title">
+                                <a href="/" class="has-text-white">LYN Bump Bot</a>
+                            </h1>                        
+                        </div>
+                    </div>
+                    <div class="navbar-menu">
+                        <div class="navbar-end">
+                            <a class="navbar-item" href="/">Home</a>                            
+                            <a class="navbar-item" href="/update-password">Update password</a>
+                            <a class="navbar-item" href="/logout">Logout</a>
+                        </div>
+                    </div>            
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="notification is-info" id="banner">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </div>            
+            {% endif %}
+        {% endwith %}
+        
+        <div class="content">
+            <div class="columns">
+                <div class="column">
+                    <h2>Manage your bump</h2>
+                </div>
+                <div class="column">
+                    <div class="field is-grouped is-grouped-right">
+                        <div class="control">
+                            <input class="input" type="text" name="url" id="url" placeholder="https://forum.lowyat.net/post/123456" />
+                        </div>
+                        <div class="control">
+                            <button class="button is-info" id="addurlbtn">Add</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="notification is-primary" id="uploadStatus" style="display: none;"></div>            
+
+            <table class="table is-bordered">
+                <thead>
+                    <tr>
+                        <th>action</th>
+                        <th>status</th>
+                        <th>title</th>
+                        <th>url</th>
+                        <th>counts</th>
+                        <th>last bump</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for x in posts %}
+                    <tr>
+                        <td>
+                            <a href="#" id="{{ x.post_id }}" class="deletebtn">delete</a>
+                            &nbsp;
+                            {% if x.status %}
+                            <a href="#" id="{{ x.post_id }}" class="stopbtn">stop</a>
+                            {% else %}
+                            <a href="#" id="{{ x.post_id }}" class="startbtn">start</a>
+                            {% endif %}
+                        </td>
+                        <td>{{ "running" if x.status else "stopped" }}</td>
+                        <td>{{ x.title }}</td>
+                        <td>{{ x.url }}</td>
+                        <td>{{ x.count }}</td>
+                        <td>{{ (x.updated_at | time2date) if x.count > 0 else "-" }}</td>
+                    </tr>    
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+<script>
+    $("#addurlbtn").click(function(){
+        let url = $("#url").val();
+        
+        $.ajax({
+            url: '/add-url',
+            type: 'POST',
+            data: {
+                "url": url
+            },
+            beforeSend: function(){
+                $('#uploadStatus').html('<span class="is-loading"></span> Uploading...');
+                $('#uploadStatus').show();
+                $('#url').prop('disabled', true);
+                $('#addurlbtn').prop('disabled', true);
+
+            },
+            success: function(data) {
+                $('#addurlbtn').prop('disabled', false);                
+                $('#uploadStatus').hide();
+                location.reload();
+            }
+        });
+    });
+
+    $(".deletebtn").click(function(){
+        let id = this.id;
+
+        $.ajax({
+            url: '/delete-url',
+            type: 'POST',
+            data: {
+                "id": id
+            },
+            success: function(data) {
+                location.reload();
+            }
+        });    
+    });
+
+    $(".stopbtn").click(function(){
+        let id = this.id;
+        $.ajax({
+            url: '/update-url',
+            type: 'POST',
+            data: {
+                "id": id, "status": 0
+            },
+            success: function(data) {
+                location.reload();
+            }
+        });         
+    });
+    $(".startbtn").click(function() {
+        let id = this.id;
+        $.ajax({
+            url: '/update-url',
+            type: 'POST',
+            data: {
+                "id": id, "status": 1
+            },
+            success: function(data) {
+                location.reload();
+            }
+        });         
+    });   
+
+    function update(status) {
+                
+    }
+
+    setTimeout(function(){
+        $('#banner').hide();
+    }, 3000);
+</script>
