@@ -94,5 +94,5 @@ class User:
         print("Logout!")
 
 if __name__ == "__main__":
-    o = Register("kktxyz")
-    o.sendCode()
+    u = User("kktxyz")
+    u.sendCode()

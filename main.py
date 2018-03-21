@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, flash, redirect, session, url_for
 from user import User
-from manage import Manage
+from post import Post
 import multiprocessing
 import sqlite3, records
 import datetime
@@ -78,8 +78,8 @@ def addURL():
         
     if request.method == 'POST':
         url = request.form['url']
-        m = Manage(session["username"])
-        status = m.add(url)
+        post = Post(session["username"])
+        status = post.add(url)
     
     return status
 
@@ -90,8 +90,8 @@ def deleteURL():
         
     if request.method == 'POST':
         id = request.form['id']
-        m = Manage(session["username"])
-        m.delete(id)
+        post = Post(session["username"])
+        post.delete(id)
     
     return "Success"
 
@@ -104,8 +104,8 @@ def updateURL():
         id = request.form['id']
         status = request.form['status']
 
-        m = Manage(session["username"])
-        m.updateStatus(id, status)
+        post = Post(session["username"])
+        post.updateStatus(id, status)
     
     return "Success"
     

@@ -2,7 +2,7 @@ from splinter import Browser
 import sqlite3, records
 import time
 
-class Manage:
+class Post:
     def __init__(self, user):
         self.db = records.Database('sqlite:///history.db')
         self.topic_url = "https://forum.lowyat.net/topic/"
@@ -77,7 +77,7 @@ class Manage:
 
 
 if __name__ == "__main__":
-    job = Task("ACHARR")
-    status = job.add("https://forum.lowyat.net/topic/4503006/+20")
+    post = Post("ACHARR")
+    status = post.add("https://forum.lowyat.net/topic/4503006/+20")
 
 

@@ -1,6 +1,6 @@
 import sqlite3, records
 
-db = records.Database('sqlite:///haha.db')
+db = records.Database('sqlite:///history.db')
 
 db.query("""
 CREATE TABLE IF NOT EXISTS `user` (
@@ -8,9 +8,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 	`username`	TEXT UNIQUE,
 	`password`	TEXT
 );
-""")
 
-db.query("""
 CREATE TABLE IF NOT EXISTS `post` (
 	`post_id`	INTEGER,
 	`title`	TEXT,

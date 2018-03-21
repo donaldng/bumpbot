@@ -1,16 +1,21 @@
 from splinter import Browser
+from environment.bot_credential import *
+import sqlite3, records
+from util.encryption import CryptoFernet
 import time
 
-class BumpBot:
+class Bump:
 
-    def __init__(self, username):
-        self.premium = True
+    def __init__(self, username=None):
+
+        self.db = records.Database('sqlite:///history.db')
         self.base_url = "https://forum.lowyat.net"
         self.topic_url = "https://forum.lowyat.net/topic/"
-        self.loaded = []
-        self.username = username
-        self.posts = [4524211, 4524212]
-        self.session = []
+        self.username = username if username else bot_username
+
+
+    def start(self):
+        self.posts = self.db.query("SELECT post_id FROM post WHERE status=1;")
 
         with Browser('firefox', headless=False) as self.browser:
             
@@ -18,8 +23,9 @@ class BumpBot:
             self.login()
             
             if self.logged_in():
-                self.bumping()
+                self.bumps()
                 self.logout()
+
 
     def logged_in(self):
         return self.browser.is_text_present(self.username)
@@ -29,15 +35,25 @@ class BumpBot:
         self.browser.visit(url)
 
     def login(self):
-        
-        self.browser.fill('UserName', self.username)
-        self.browser.fill('PassWord', 'pascodep')
 
-        print("Login with username {} and password *****".format(self.username))
+        password = bot_password
+
+        if self.username != bot_username:
+            password = self.retrievePassword(self.username)
+
+        self.browser.fill('UserName', self.username)
+        self.browser.fill('PassWord', password)
+
+        masked_password = self.maskPassword(password)
+
+        print("Login with username {} and password {}".format(self.username, masked_password))
 
         button = self.browser.find_by_css('.button')
         button.click()
         print("We in!")
+
+    def maskPassword(self, password):
+        return "".join(["*" for i in range(len(password))])
 
     def logout(self):
         logout_link = self.browser.find_by_text('Log out')
@@ -47,10 +63,18 @@ class BumpBot:
     def scrollDown(self):
         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(3)
-    
-    def bumping(self):
-        for post in self.posts:
-            self.visit("{}{}".format(self.topic_url, post))
+
+    def retrievePassword(self, username):
+        cf = CryptoFernet()
+
+        token = self.db.query("SELECT password FROM user WHERE username=:username", False, username=username)[0].password
+        password = cf.decrypt(token)
+
+        return password
+
+    def bumps(self):
+        for row in self.posts:
+            self.visit("{}{}".format(self.topic_url, row.post_id))
             self.scrollDown()
             self.browser.fill('Post', 'bump!')
             submit_button = self.browser.find_by_name('submit')
@@ -59,4 +83,5 @@ class BumpBot:
             time.sleep(3)        
 
 if __name__ == "__main__":
-    BumpBot("donduck")
+    bump = Bump()
+    bump.start()
