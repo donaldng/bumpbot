@@ -1,5 +1,5 @@
 from splinter import Browser
-from environment.bot_credential import *
+from environment.config import *
 import sqlite3, records
 from util.encryption import CryptoFernet
 import time
@@ -8,7 +8,7 @@ class Bump:
 
     def __init__(self, username=None):
 
-        self.db = records.Database('sqlite:///history.db')
+        self.db = records.Database('sqlite:///{}'.format(dbname))
         self.base_url = "https://forum.lowyat.net"
         self.topic_url = "https://forum.lowyat.net/topic/"
         self.username = username if username else bot_username

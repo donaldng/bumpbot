@@ -2,13 +2,13 @@ import sqlite3, records
 from splinter import Browser
 from util.encryption import CryptoFernet
 from util.passwordGenerator import password_generator
-from environment.bot_credential import *
+from environment.config import *
 import time
 
 class User:
 
     def __init__(self, username):
-        self.db = records.Database('sqlite:///history.db')
+        self.db = records.Database('sqlite:///{}'.format(dbname))
 
         self.bot_username = bot_username
         self.bot_password = bot_password

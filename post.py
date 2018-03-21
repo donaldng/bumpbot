@@ -1,10 +1,11 @@
+from environment.config import *
 from splinter import Browser
 import sqlite3, records
 import time
 
 class Post:
     def __init__(self, user):
-        self.db = records.Database('sqlite:///history.db')
+        self.db = records.Database('sqlite:///{}'.format(dbname))
         self.topic_url = "https://forum.lowyat.net/topic/"
         self.requestor = user
 

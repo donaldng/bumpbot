@@ -3,3 +3,5 @@
 
 bot_username = ""
 bot_password = ""
+
+dbname = "bumpbot.db"

@@ -4,6 +4,7 @@ from post import Post
 import multiprocessing
 import sqlite3, records
 import datetime
+from environment.config import *
 
 
 app = Flask(__name__)
@@ -17,7 +18,7 @@ def index():
     try:
         if session['logged_in']:
             page = 'manage.html'
-            db = records.Database('sqlite:///history.db')
+            db = records.Database('sqlite:///{}'.format(dbname))
             posts = db.query('SELECT * FROM post WHERE user_id={}'.format(session['user_id']))
             return render_template(page, posts=posts)
     except:

@@ -4,4 +4,4 @@ __pycache__
 .privatekey
 *.log
 *.db
-bot_credential.py
+config.py
