@@ -65,6 +65,23 @@ class Post:
 
         return post_id
 
+    def get(self, user_id=0, username=None):
+
+        condition = []
+        where_statement = ""
+        
+        if user_id:
+            condition.append("user_id='{}'".format(user_id))
+        
+        if username:
+            condition.append("username='{}'".format(username))
+
+        if len(condition) > 0:
+            where_statement = "WHERE {}".format(" AND ".join(condition))
+
+        return self.db.query('SELECT * FROM post {};'.format(where_statement))
+
+
     def getPostInfo(self, post_id):
         with Browser('firefox', headless=True) as browser:
             url = "{}{}".format(self.topic_url, post_id)
