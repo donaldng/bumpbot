@@ -19,7 +19,10 @@ def index():
         if session['logged_in']:
             page = 'manage.html'
             db = records.Database('sqlite:///{}'.format(dbname))
-            posts = db.query('SELECT * FROM post WHERE user_id={}'.format(session['user_id']))
+            
+            post = Post(session["username"])
+            posts = post.get(user_id=session['user_id'])     
+
             return render_template(page, posts=posts)
     except:
         pass
