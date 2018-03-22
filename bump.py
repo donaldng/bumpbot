@@ -17,7 +17,7 @@ class Bump:
     def start(self):
         self.posts = self.db.query("SELECT post_id FROM post WHERE status=1;")
 
-        with Browser('firefox', headless=False) as self.browser:
+        with Browser('firefox', headless=True) as self.browser:
             
             self.visit(self.base_url)
             self.login()
