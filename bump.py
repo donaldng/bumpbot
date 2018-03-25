@@ -2,7 +2,9 @@ from splinter import Browser
 from environment.config import *
 import sqlite3, records
 from util.encryption import CryptoFernet
+from util.misc import maskPassword
 import time
+
 
 class Bump:
 
@@ -44,16 +46,13 @@ class Bump:
         self.browser.fill('UserName', self.username)
         self.browser.fill('PassWord', password)
 
-        masked_password = self.maskPassword(password)
+        masked_password = maskPassword(password)
 
         print("Login with username {} and password {}".format(self.username, masked_password))
 
         button = self.browser.find_by_css('.button')
         button.click()
         print("We in!")
-
-    def maskPassword(self, password):
-        return "".join(["*" for i in range(len(password))])
 
     def logout(self):
         logout_link = self.browser.find_by_text('Log out')

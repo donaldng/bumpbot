@@ -31,33 +31,42 @@
 
 <section class="section">
     <div class="container">
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <div class="notification is-info" id="banner">
-                    {% for message in messages %}
-                        {{ message }}
-                    {% endfor %}
-                </div>            
-            {% endif %}
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="notification is-{{ category }}" id="banner">    
+                    <b>{{ message }}</b>
+                </div>
+            {% endfor %}
         {% endwith %}
-        
+
         <div class="content">
             <div class="columns">
                 <div class="column">
                     <h2>Manage your bump</h2>
                 </div>
                 <div class="column">
-                    <div class="field is-grouped is-grouped-right">
-                        <div class="control">
-                            <input class="input" type="text" name="url" id="url" placeholder="https://forum.lowyat.net/post/123456" />
-                        </div>
-                        <div class="control">
-                            <button class="button is-info" id="addurlbtn">Add</button>
-                        </div>
-                    </div>
+                    <p class="is-pulled-right button">
+                        <b>Premium status:&nbsp;<span class="has-text-danger">Deactivated</span></b>
+                    </p>                    
                 </div>
             </div>
-            <div class="notification is-primary" id="uploadStatus" style="display: none;"></div>            
+            <div class="notification is-primary" id="uploadStatus" style="display: none;"></div>  
+            
+            {% if disableAddBtn %}
+            <span class="has-text-danger">
+                <b>You have reached maximum post number.</b>
+            </span>            
+            {% endif %}
+
+            <div class="field is-grouped">
+                <div class="control">
+                    <input class="input" type="text" name="url" id="url" placeholder="https://forum.lowyat.net/topic/123456" {% if disableAddBtn %} disabled="disabled" {% endif %} />
+                </div>
+                <div class="control">
+                    <button class="button is-info" id="addurlbtn" {% if disableAddBtn %} disabled="disabled" {% endif %}>Add Post</button>
+                </div>
+            </div>
 
             <table class="table is-bordered">
                 <thead>
@@ -90,7 +99,7 @@
                     </tr>    
                     {% endfor %}
                 </tbody>
-            </table>
+            </table>         
         </div>
     </div>
 </section>
@@ -105,7 +114,7 @@
                 "url": url
             },
             beforeSend: function(){
-                $('#uploadStatus').html('<span class="is-loading"></span> Uploading...');
+                $('#uploadStatus').html('<span class="is-loading"></span> Verifying topic owner...');
                 $('#uploadStatus').show();
                 $('#url').prop('disabled', true);
                 $('#addurlbtn').prop('disabled', true);
@@ -167,5 +176,5 @@
 
     setTimeout(function(){
         $('#banner').hide();
-    }, 3000);
+    }, 5000);
 </script>

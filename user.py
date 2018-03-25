@@ -3,6 +3,7 @@ from splinter import Browser
 from util.encryption import CryptoFernet
 from util.passwordGenerator import password_generator
 from environment.config import *
+from util.misc import maskPassword
 import time
 
 class User:
@@ -15,9 +16,11 @@ class User:
 
         self.username = username
         self.cf = CryptoFernet()
+        self.newUser = False
 
         if not self.registered():
-            self.addRecord()
+            self.add()
+            self.newUser = True
         else:
             self.password = self.getPassword()
 
@@ -29,23 +32,51 @@ class User:
 
         return user_id
 
-    def sendCode(self):
+    def firstTime(self):
+        status = self.db.query("SELECT firsttime FROM user WHERE username=:username", False, username=self.username)[0].firsttime
+        return status
+
+    def notFirstTime(self):
+        self.db.query("UPDATE user SET firsttime=0 WHERE username=:username", False, username=self.username)
+
+    def sendCode(self, url):
 
         with Browser('firefox', headless=True) as self.browser:
             self.login()
-            self.sendMsg()
+            self.sendMsg(url)
             self.logout()
         
-    def sendMsg(self):
-            b = self.browser
-        
-            b.visit("https://forum.lowyat.net/index.php?act=Msg&CODE=04")
-            b.fill('entered_name', self.username)
-            b.fill('msg_title', 'bump bot verification')
-            b.fill('Post', 'Your verification code is {}'.format(self.password))
+    def sendMsg(self, root_url):
+        password = self.getPassword()
 
-            submitbtn = b.find_by_name("submit")
-            submitbtn.click()
+        loginPath = "/login"
+        if root_url[-1] == "/":
+            loginPath = "login"
+
+        url = "{}{}".format(root_url, loginPath)
+
+        body = """Dear {username},
+
+        Your login password is {password}.
+        
+        Click here to login: {url}/{username}/{token}
+
+        Please change your password after you login.
+        
+        Thank you.
+
+        Bumpbot
+        """.format(url=url, username=self.username, password=password, token=self.cf.encrypt(password))
+
+        b = self.browser
+        
+        b.visit("https://forum.lowyat.net/index.php?act=Msg&CODE=04")
+        b.fill('entered_name', self.username)
+        b.fill('msg_title', 'bump bot verification')
+        b.fill('Post', body)
+
+        submitbtn = b.find_by_name("submit")
+        submitbtn.click()
 
     def login(self):
         b = self.browser
@@ -54,21 +85,19 @@ class User:
         b.fill('UserName', self.bot_username)
         b.fill('PassWord', self.bot_password)
 
-        print("Login with username {} and password *****".format(self.bot_username))
+        print("Login with username {} and password {}".format(self.bot_username, maskPassword(self.bot_password)))
 
         button = b.find_by_css('.button')
         button.click()
         print("We in!")
 
 
-    def addRecord(self):
+    def add(self):
         self.password = password_generator()
-
-        print(self.password)
 
         if not self.registered():
             encrypted_password = self.cf.encrypt(self.password)
-            self.db.query('INSERT INTO user (username, password) VALUES ("{un}", "{ps}")'.format(un=self.username.lower(), ps=encrypted_password))        
+            self.db.query('INSERT INTO user (username, password, created_at) VALUES ("{un}", "{ps}", NOW())'.format(un=self.username.lower(), ps=encrypted_password))        
 
     def getPassword(self):
         password = self.db.query("SELECT password FROM user WHERE LOWER(username) = '{}'".format(self.username.lower()))[0].password

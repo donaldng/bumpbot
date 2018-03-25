@@ -5,7 +5,7 @@ import multiprocessing
 import sqlite3, records
 import datetime
 from environment.config import *
-
+from util.encryption import CryptoFernet
 
 app = Flask(__name__)
 app.secret_key = "1234567890password0987654321"
@@ -21,9 +21,15 @@ def index():
             db = records.Database('sqlite:///{}'.format(dbname))
             
             post = Post(session["username"])
-            posts = post.get(user_id=session['user_id'])     
+            limit = post.limit
 
-            return render_template(page, posts=posts)
+            posts = post.get(user_id=session['user_id'])
+
+            disableAddBtn = False
+            if len(posts.all()) >= limit:
+                disableAddBtn = True
+
+            return render_template(page, posts=posts, disableAddBtn=disableAddBtn)
     except:
         pass
 
@@ -37,17 +43,25 @@ def register():
         username = request.form['register_username']
         u = User(username)
 
-        t = multiprocessing.Process(target=u.sendCode)
-        t.start()
+        if u.newUser:
+            url_root = request.url_root
+            print("baseURL is {}".format(url_root))
+            t = multiprocessing.Process(target=u.sendCode, args=(url_root,))
+            t.start()
 
-        msg = 'We have successfully sent you a code. Please check your LYN inbox!'
+            msg = 'We have successfully sent you a code. Please check your LYN inbox!'
+            category = "primary"
+        else:
+            msg = '{} is already a registered user.'.format(username)
+            category = "warning"
 
-    flash(msg)
+    flash(msg, category)
     return redirect(url_for("index"))
 
 @app.route("/login", methods=['POST'])
 def login():
     msg = "Successfully logged in!"
+    category = "primary"
     if request.method == 'POST':
 
         username = request.form['username']
@@ -62,16 +76,26 @@ def login():
             session["user_id"] = result
         else:
             msg = "Wrong username and/or password!"
+            category = "danger"
 
-    flash(msg)
+    flash(msg, category)
     return redirect(url_for("index"))
 
 @app.route("/update-password")
 def updatePassword():
+    oldpassword = ""
+
     if session["logged_in"]:
-        page = render_template("updatePassword.html")
+        u = User(session["username"])
+        isFirstTime = u.firstTime()
+        
+        if isFirstTime:
+            oldpassword = u.getPassword()
+            flash("Please update your password.", "warning")
+            
+        page = render_template("updatePassword.html", oldpassword=oldpassword)
     else:
-        flash("You need to login first!")
+        flash("You need to login first!", "warning")
         page = redirect(url_for("index"))
     return page
 
@@ -83,7 +107,10 @@ def addURL():
     if request.method == 'POST':
         url = request.form['url']
         post = Post(session["username"])
-        status = post.add(url)
+        count = len(post.get(user_id=session["user_id"]).all())
+        
+        if count < post.limit:
+            status = post.add(url)
     
     return status
 
@@ -110,14 +137,14 @@ def updateURL():
 
         post = Post(session["username"])
         post.updateStatus(id, status)
-    
+
     return "Success"
     
 @app.route("/update-db-password", methods=['POST'])
 def updateDBPassword():
 
     if not session["logged_in"]:
-        flash("You need to login first!")
+        flash("You need to login first!", "warning")
         page = redirect(url_for("index"))    
 
     old_password = request.form['old_password']
@@ -131,8 +158,9 @@ def updateDBPassword():
 
     if valid and old_new_not_same:
         u.updatePassword(session["username"], new_password)
+        u.notFirstTime()
 
-        flash("Password sucessfully updated!")
+        flash("Password sucessfully updated!", "primary")
         page = redirect(url_for("index"))            
     else:
         msg = "Password not matched. Please try again!"
@@ -140,11 +168,39 @@ def updateDBPassword():
         if not old_new_not_same:
             msg = "Failed to change password. Please use a new password!"
 
-        flash(msg)
+        flash(msg, "warning")
         page = render_template("updatePassword.html")
     
     return page
 
+@app.route("/login/<username>/<token>")
+def linkLogin(username=None, token=None):    
+
+    page = redirect(url_for("index"))
+
+    if username and token:
+
+        u = User(username)
+        firsttime = u.firstTime()   
+
+        if firsttime:
+            c = CryptoFernet()
+
+            password = c.decrypt(token)
+            print("password is {}".format(password))
+
+            user_id = u.validate(password)
+            session['logged_in'] = user_id
+            print("user_id is {}".format(user_id))
+            if user_id:
+                session["username"] = username
+                session["user_id"] = user_id
+                flash("Please update your password.", "warning")
+                page = render_template("updatePassword.html", oldpassword=password)
+            else:
+                msg = "Wrong username and/or password!"
+    
+    return page
 
 @app.route("/logout")
 def logout():
@@ -156,7 +212,7 @@ def logout():
         session['user_id'] = 0
         msg = "Successfully logged out!"
 
-    flash(msg)
+    flash(msg, "primary")
     return redirect(url_for("index"))
 
 @app.template_filter('time2date')

@@ -5,10 +5,12 @@ def createDB():
 	db = records.Database('sqlite:///{}'.format(dbname))
 
 	db.query("""
-	CREATE TABLE IF NOT EXISTS `user` (
+	CREATE TABLE `user` (
 		`user_id`	INTEGER PRIMARY KEY AUTOINCREMENT,
 		`username`	TEXT UNIQUE,
-		`password`	TEXT
+		`password`	TEXT,
+		`firsttime`	INTEGER DEFAULT 1,
+		`created_at`	DATETIME DEFAULT 0
 	);
 	CREATE TABLE IF NOT EXISTS `post` (
 		`post_id`	INTEGER,

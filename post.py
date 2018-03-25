@@ -8,6 +8,7 @@ class Post:
         self.db = records.Database('sqlite:///{}'.format(dbname))
         self.topic_url = "https://forum.lowyat.net/topic/"
         self.requestor = user
+        self.limit = 1
 
     def add(self, url):
         post_id = self.process_id(url)
