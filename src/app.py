@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, flash, redirect, session, url_for
-from user import User
-from post import Post
+from model.user import User
+from model.post import Post
 import multiprocessing
 import sqlite3, records
 import datetime
@@ -108,7 +108,7 @@ def addURL():
         url = request.form['url']
         post = Post(session["username"])
         count = len(post.get(user_id=session["user_id"]).all())
-        
+
         if count < post.limit:
             status = post.add(url)
     
