@@ -17,16 +17,18 @@ class Bump:
 
 
     def start(self):
-        self.posts = self.db.query("SELECT post_id FROM post WHERE status=1;")
-
-        with Browser('firefox', headless=True) as self.browser:
-            
-            self.visit(self.base_url)
-            self.login()
-            
-            if self.logged_in():
-                self.bumps()
-                self.logout()
+        now_time = int(time.time())
+        self.posts = self.db.query("SELECT post_id FROM post WHERE status=1 AND {now_time} > next_execution AND next_execution != 0;".format(now_time=now_time))
+        
+        if len(self.posts.all()) > 0:
+            with Browser('firefox', headless=True) as self.browser:
+                
+                self.visit(self.base_url)
+                self.login()
+                
+                if self.logged_in():
+                    self.bumps()
+                    self.logout()
 
 
     def logged_in(self):
@@ -77,9 +79,9 @@ class Bump:
             self.scrollDown()
             self.browser.fill('Post', 'bump!')
             submit_button = self.browser.find_by_name('submit')
-            # submit_button.click()
+            submit_button.click()
             print("Submit!")
-            time.sleep(3)        
+            time.sleep(3)
 
 if __name__ == "__main__":
     bump = Bump()

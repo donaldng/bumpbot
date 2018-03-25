@@ -4,7 +4,7 @@ import sqlite3, records
 import time
 
 class Post:
-    def __init__(self, user):
+    def __init__(self, user=None):
         self.db = records.Database('sqlite:///{}'.format(dbname))
         self.topic_url = "https://forum.lowyat.net/topic/"
         self.requestor = user
