@@ -95,7 +95,7 @@
                         <td>{{ x.title }}</td>
                         <td>{{ x.url }}</td>
                         <td>{{ x.count }}</td>
-                        <td>{{ (x.updated_at | time2date) if x.count > 0 else "-" }}</td>
+                        <td>{{ (x.last_bump | time2date) if x.count > 0 else "-" }}</td>
                     </tr>    
                     {% endfor %}
                 </tbody>

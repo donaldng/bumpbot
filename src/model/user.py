@@ -3,7 +3,7 @@ from splinter import Browser
 from util.encryption import CryptoFernet
 from util.passwordGenerator import password_generator
 from environment.config import *
-from util.misc import maskPassword
+from util.misc import maskPassword, log
 import time
 
 class User:
@@ -85,11 +85,11 @@ class User:
         b.fill('UserName', self.bot_username)
         b.fill('PassWord', self.bot_password)
 
-        print("Login with username {} and password {}".format(self.bot_username, maskPassword(self.bot_password)))
+        log("Login with username {} and password {}".format(self.bot_username, maskPassword(self.bot_password)))
 
         button = b.find_by_css('.button')
         button.click()
-        print("We in!")
+        log("We in!")
 
 
     def add(self):
@@ -120,7 +120,7 @@ class User:
     def logout(self):
         logout_link = self.browser.find_by_text('Log out')
         logout_link.click()
-        print("Logout!")
+        log("Logout!")
 
 if __name__ == "__main__":
     u = User("kktxyz")

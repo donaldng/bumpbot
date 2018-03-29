@@ -18,10 +18,12 @@ def createDB():
 		`url`	TEXT,
 		`count`	INTEGER DEFAULT 0,
 		`status`	INTEGER DEFAULT 1,
+		`deleted`	INTEGER DEFAULT 0,
 		`user_id`	INTEGER,
 		`next_execution`	INTEGER DEFAULT 0,
 		`created_at`	INTEGER,
 		`updated_at`	INTEGER,
+		`last_bump`	INTEGER DEFAULT 0,
 		PRIMARY KEY(`post_id`)
 	);
 	""")

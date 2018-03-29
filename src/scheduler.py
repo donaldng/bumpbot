@@ -2,7 +2,7 @@ from model.bump import Bump
 from model.post import Post
 from random import randint
 import datetime, time
-from util.misc import time2date
+from util.misc import time2date, log
 
 def randomNextExecution():
     # set next run time within 0900~1800
@@ -13,7 +13,7 @@ def randomNextExecution():
     return randint(start, end)
 
 def scheduler(post_id=None):
-    print("start scheduler")
+    log("start scheduler")
 
     cond = ""
 
@@ -25,21 +25,21 @@ def scheduler(post_id=None):
 
     for post in posts:
         next_execution = randomNextExecution()
-        print("update post_id {}".format(post.post_id))
+        log("update post_id {}".format(post.post_id))
         scheduler.db.query("UPDATE post SET next_execution=:next_execution WHERE user_id=:user_id and post_id=:post_id AND status=1;", False, next_execution=next_execution, user_id=post.user_id, post_id=post.post_id)
     
-    print("end scheduler")
+    log("end scheduler")
 
 def start():
-    print("start bump")
+    log("start bump")
     b = Bump()
     b.start()
-    print("end bump")
+    log("end bump")
 
 
 # start()
 # main()
 
 # gg = randomNextExecution()
-# print(gg)
-# print(time2date(gg))
+# log(gg)
+# log(time2date(gg))

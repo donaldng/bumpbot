@@ -2,7 +2,7 @@ from splinter import Browser
 from environment.config import *
 import sqlite3, records
 from util.encryption import CryptoFernet
-from util.misc import maskPassword
+from util.misc import maskPassword, log
 import time
 
 
@@ -35,7 +35,7 @@ class Bump:
         return self.browser.is_text_present(self.username)
 
     def visit(self, url):
-        print("visit {}".format(url))
+        log("visit {}".format(url))
         self.browser.visit(url)
 
     def login(self):
@@ -50,16 +50,16 @@ class Bump:
 
         masked_password = maskPassword(password)
 
-        print("Login with username {} and password {}".format(self.username, masked_password))
+        log("Login with username {} and password {}".format(self.username, masked_password))
 
         button = self.browser.find_by_css('.button')
         button.click()
-        print("We in!")
+        log("We in!")
 
     def logout(self):
         logout_link = self.browser.find_by_text('Log out')
         logout_link.click()
-        print("Logout!")
+        log("Logout!")
 
     def scrollDown(self):
         self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -73,6 +73,9 @@ class Bump:
 
         return password
 
+    def updateBumpCount(self):
+        self.db.query("UPDATE post SET count = count + 1, last_bump={t}, updated_at={t}, next_execution=0".format(t=int(time.time())))
+
     def bumps(self):
         for row in self.posts:
             self.visit("{}{}".format(self.topic_url, row.post_id))
@@ -80,8 +83,7 @@ class Bump:
             self.browser.fill('Post', 'bump!')
             submit_button = self.browser.find_by_name('submit')
             submit_button.click()
-            print("Submit!")
-            time.sleep(3)
+            self.updateBumpCount()
 
 if __name__ == "__main__":
     bump = Bump()

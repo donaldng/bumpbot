@@ -1,4 +1,5 @@
 from environment.config import *
+from util.misc import log
 from splinter import Browser
 import sqlite3, records
 import time
@@ -13,7 +14,7 @@ class Post:
     def add(self, url):
         post_id = self.process_id(url)
         
-        print("post_id is {}".format(post_id))
+        log("post_id is {}".format(post_id))
 
         post_title, post_owner =  self.getPostInfo(post_id)
         is_owner = post_owner.lower() == self.requestor.lower()
@@ -21,33 +22,34 @@ class Post:
         if post_id and is_owner:
             status = "Verified success, will bump {}{} for {}!".format(self.topic_url, post_id, self.requestor)
             try:
-                self.db.query("INSERT INTO post (post_id, title, url, count, status, user_id, created_at, updated_at) VALUES ({pid}, '{title}', '{base}{pid}', 0, 1, (SELECT user_id FROM user WHERE LOWER(username)='{uname}'), {t}, {t})".format(pid=post_id, base=self.topic_url, uname=self.requestor.lower(), t=time.time(), title=post_title))
+                self.db.query("INSERT OR IGNORE INTO post (post_id, title, url, count, status, user_id, created_at, updated_at) VALUES ({pid}, '{title}', '{base}{pid}', 0, 1, (SELECT user_id FROM user WHERE LOWER(username)='{uname}'), {t}, {t})".format(pid=post_id, base=self.topic_url, uname=self.requestor.lower(), t=int(time.time()), title=post_title))
+                self.db.query("UPDATE post SET deleted=0, updated_at={t} WHERE post_id={pid} AND user_id=(SELECT user_id FROM user WHERE LOWER(username)='{uname}')".format(pid=post_id, uname=self.requestor.lower(), t=int(time.time())))
             except:
                 status = "Error inserting post"
-                print(status)
+                log(status)
                 pass
 
         elif not is_owner:
             status = "post owner is {}, not you, {}".format(post_owner, self.requestor)
-            print(status)
+            log(status)
         else:
             status = "unable to process url {}".format(url)
-            print(status)
+            log(status)
         
         return status
     
     def delete(self, post_id):
-        print("delete post_id {}".format(post_id))
+        log("delete post_id {}".format(post_id))
 
         post_owner = self.db.query("SELECT u.username FROM post p, user u WHERE u.user_id=p.user_id AND post_id=:post_id", False, post_id=post_id)[0].username
-        print("post_owner is {}".format(post_owner))
+        log("post_owner is {}".format(post_owner))
 
         if post_owner.lower() == self.requestor.lower():
-            self.db.query("DELETE FROM post WHERE post_id=:post_id", False, post_id=post_id)
-            print("deleted")
+            self.db.query("UPDATE post SET deleted=1 AND status=0 WHERE post_id=:post_id", False, post_id=post_id)
+            log("deleted")
 
     def updateStatus(self, post_id, status):
-        print("stop post_id {}".format(post_id))
+        log("stop post_id {}".format(post_id))
 
         post_owner = self.db.query("SELECT u.username FROM post p, user u WHERE u.user_id=p.user_id AND post_id=:post_id", False, post_id=post_id)[0].username
 
@@ -78,15 +80,15 @@ class Post:
             condition.append("username='{}'".format(username))
 
         if len(condition) > 0:
-            where_statement = "WHERE {}".format(" AND ".join(condition))
+            where_statement = " AND {}".format(" AND ".join(condition))
 
-        return self.db.query('SELECT * FROM post {};'.format(where_statement))
+        return self.db.query('SELECT * FROM post WHERE deleted=0 {};'.format(where_statement))
 
 
     def getPostInfo(self, post_id):
         with Browser('firefox', headless=True) as browser:
             url = "{}{}".format(self.topic_url, post_id)
-            print("visit {}".format(url))
+            log("visit {}".format(url))
             browser.visit(url)
 
             topicTitle = browser.title

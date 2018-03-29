@@ -6,6 +6,7 @@ import sqlite3, records
 import datetime
 from environment.config import *
 from util.encryption import CryptoFernet
+from util.misc import log
 
 app = Flask(__name__)
 app.secret_key = "1234567890password0987654321"
@@ -24,7 +25,7 @@ def index():
             limit = post.limit
 
             posts = post.get(user_id=session['user_id'])
-
+            print(posts)
             disableAddBtn = False
             if len(posts.all()) >= limit:
                 disableAddBtn = True
@@ -45,7 +46,7 @@ def register():
 
         if u.newUser:
             url_root = request.url_root
-            print("baseURL is {}".format(url_root))
+            log("baseURL is {}".format(url_root))
             t = multiprocessing.Process(target=u.sendCode, args=(url_root,))
             t.start()
 
@@ -187,11 +188,11 @@ def linkLogin(username=None, token=None):
             c = CryptoFernet()
 
             password = c.decrypt(token)
-            print("password is {}".format(password))
+            log("password is {}".format(password))
 
             user_id = u.validate(password)
             session['logged_in'] = user_id
-            print("user_id is {}".format(user_id))
+            log("user_id is {}".format(user_id))
             if user_id:
                 session["username"] = username
                 session["user_id"] = user_id
@@ -217,9 +218,9 @@ def logout():
 
 @app.template_filter('time2date')
 def time2date(ts):
-    print(ts)
+    log(ts)
     result = datetime.datetime.fromtimestamp(int(ts)).strftime('%Y-%m-%d %H:%M:%S')
-    print(result)
+    log(result)
     return result
 
 if __name__ == '__main__':

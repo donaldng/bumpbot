@@ -25,6 +25,6 @@ class CryptoFernet:
             result = f(self.pk).decrypt(token.encode("utf-8")).decode('utf-8')
         except:
             result = None        
-            print("Invalid token or string cannot be decrypted through private key!")
+            log("Invalid token or string cannot be decrypted through private key!")
 
         return result

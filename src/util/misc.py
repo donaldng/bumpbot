@@ -4,3 +4,9 @@ def maskPassword(password):
 def time2date(ts):
     import time
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(ts))
+
+def log(msg):
+    print(msg)
+    fh = open("error.log", "a")
+    fh.write(msg)
+    fh.close
