@@ -97,7 +97,7 @@ class User:
 
         if not self.registered():
             encrypted_password = self.cf.encrypt(self.password)
-            self.db.query('INSERT INTO user (username, password, created_at) VALUES ("{un}", "{ps}", NOW())'.format(un=self.username.lower(), ps=encrypted_password))        
+            self.db.query('INSERT INTO user (username, password, created_at) VALUES ("{un}", "{ps}", datetime("now"))'.format(un=self.username.lower(), ps=encrypted_password))        
 
     def getPassword(self):
         password = self.db.query("SELECT password FROM user WHERE LOWER(username) = '{}'".format(self.username.lower()))[0].password
