@@ -21,3 +21,12 @@ sudo apt-get install software-properties-common
 sudo add-apt-repository ppa:mozillateam/firefox-next
 sudo apt-get update
 sudo apt-get install firefox
+
+
+# Installation
+
+## Crontab
+
+crontab -e
+* * * * * /var/www/bumpbot/src/venv/bin/python3.6 /var/www/bumpbot/src/bumpnow.py
+0 0 * * * /var/www/bumpbot/src/venv/bin/python3.6 /var/www/bumpbot/src/scheduler.py
