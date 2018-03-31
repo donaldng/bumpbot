@@ -30,7 +30,6 @@ class Bump:
                     self.bumps()
                     self.logout()
 
-
     def logged_in(self):
         return self.browser.is_text_present(self.username)
 

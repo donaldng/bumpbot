@@ -30,16 +30,6 @@ def scheduler(post_id=None):
     
     log("end scheduler")
 
-def start():
-    log("start bump")
-    b = Bump()
-    b.start()
-    log("end bump")
 
-
-# start()
-# main()
-
-# gg = randomNextExecution()
-# log(gg)
-# log(time2date(gg))
+if __name__ == "__main__":
+    scheduler()
