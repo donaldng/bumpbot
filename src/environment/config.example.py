@@ -4,4 +4,5 @@
 bot_username = ""
 bot_password = ""
 
+app_src_path = "/var/www/bumpbot/src/"
 dbname = "bumpbot.db"

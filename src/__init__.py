@@ -7,9 +7,12 @@ import datetime
 from environment.config import *
 from util.encryption import CryptoFernet
 from util.misc import log
+import os
 
 app = Flask(__name__)
 app.secret_key = "1234567890password0987654321"
+
+os.chdir(app_src_path)
 
 @app.route('/')
 def index():
