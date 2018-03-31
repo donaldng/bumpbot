@@ -20,13 +20,14 @@ class User:
 
         if not self.registered():
             self.newUser = True
+            self.password = password_generator()
         else:
             self.password = self.getPassword()
 
     def validate(self, password):
         user_id = 0
 
-        if password == self.password:
+        if self.registered() and password == self.password:
             user_id = self.getUserId()
 
         return user_id
@@ -92,8 +93,6 @@ class User:
 
 
     def add(self):
-        self.password = password_generator()
-        
         if not self.registered():
             encrypted_password = self.cf.encrypt(self.password)
             self.db.query('INSERT INTO user (username, password, created_at) VALUES ("{un}", "{ps}", datetime("now"))'.format(un=self.username.lower(), ps=encrypted_password))        
