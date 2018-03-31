@@ -1,6 +1,7 @@
 from model.bump import Bump
 from util.misc import log
 from environment.config import *
+import os
 
 def start():
     log("start bump")

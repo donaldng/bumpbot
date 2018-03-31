@@ -4,6 +4,7 @@ from random import randint
 import datetime, time
 from util.misc import time2date, log
 from environment.config import *
+import os
 
 def randomNextExecution():
     # set next run time within 0900~1800
