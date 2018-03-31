@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
-<title>WeBump</title>
+<title>WeBump! Bump as a Service</title>
 
 <section class="hero is-info">
     <div class="hero-head">
@@ -12,7 +12,7 @@
                     <div class="navbar-brand">
                         <div class="navbar-item">
                             <h1 class="title">
-                                <a href="/" class="has-text-white">WeBump</a>
+                                <a href="/" class="has-text-white">WeBump!</a>
                             </h1>                        
                         </div>
                     </div>
@@ -76,6 +76,7 @@
                         <th>title</th>
                         <th>url</th>
                         <th>counts</th>
+                        <th>next bump</th>
                         <th>last bump</th>
                     </tr>
                 </thead>
@@ -95,6 +96,7 @@
                         <td>{{ x.title }}</td>
                         <td>{{ x.url }}</td>
                         <td>{{ x.count }}</td>
+                        <td>{{ (x.next_execution | time2date) if x.next_execution != 0 else "Pending to be scheduled @ 12am" }}</td>
                         <td>{{ (x.last_bump | time2date) if x.count > 0 else "-" }}</td>
                     </tr>    
                     {% endfor %}
