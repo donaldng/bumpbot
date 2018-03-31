@@ -1,4 +1,5 @@
 from model.bump import Bump
+from util.misc import log
 
 def start():
     log("start bump")
