@@ -49,6 +49,7 @@ def register():
 
         if u.newUser:
             u.add()
+            log("Adding new user {}".format(username))
             
             url_root = request.url_root
             log("baseURL is {}".format(url_root))

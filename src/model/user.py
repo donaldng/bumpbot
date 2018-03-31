@@ -48,13 +48,16 @@ class User:
         
     def sendMsg(self, root_url):
         password = self.getPassword()
-
+        token = self.cf.encrypt(password)
+        
         loginPath = "/login"
         if root_url[-1] == "/":
             loginPath = "login"
 
         url = "{}{}".format(root_url, loginPath)
 
+        log("Sending code to {username} with url: {url}/{username}/{token}".format(username=self.username, url=url, token=token))
+        
         body = """Dear {username},
 
         Your login password is {password}.
@@ -66,7 +69,7 @@ class User:
         Thank you.
 
         WeBump!
-        """.format(url=url, username=self.username, password=password, token=self.cf.encrypt(password))
+        """.format(url=url, username=self.username, password=password, token=token)
 
         b = self.browser
         
@@ -77,6 +80,8 @@ class User:
 
         submitbtn = b.find_by_name("submit")
         submitbtn.click()
+
+        log("Successfully sent code to {}".format(self.username))
 
     def login(self):
         b = self.browser
