@@ -34,5 +34,5 @@ def scheduler(post_id=None):
 
 
 if __name__ == "__main__":
-    chdir(app_src_path)
+    os.chdir(app_src_path)
     scheduler()
