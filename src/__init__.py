@@ -28,7 +28,7 @@ def index():
             limit = post.limit
 
             posts = post.get(user_id=session['user_id'])
-            print(posts)
+
             disableAddBtn = False
             if len(posts.all()) >= limit:
                 disableAddBtn = True
@@ -220,9 +220,14 @@ def logout():
     return redirect(url_for("index"))
 
 @app.template_filter('time2date')
-def time2date(ts):
-    log(ts)
-    result = datetime.datetime.fromtimestamp(int(ts)).strftime('%Y-%m-%d %H:%M:%S')
+def time2date(timestampp):
+    log("timestamp is..... {}".format(timestampp))
+
+    try:
+        result = datetime.datetime.fromtimestamp(int(timestampp)).strftime('%Y-%m-%d %H:%M:%S')
+    except:
+        result = 123
+
     log(result)
     return result
 
