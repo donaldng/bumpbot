@@ -3,6 +3,7 @@ from model.post import Post
 from random import randint
 import datetime, time
 from util.misc import time2date, log
+from environment.config import *
 
 def randomNextExecution():
     # set next run time within 0900~1800
@@ -32,4 +33,5 @@ def scheduler(post_id=None):
 
 
 if __name__ == "__main__":
+    chdir(app_src_path)
     scheduler()
