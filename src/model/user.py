@@ -65,14 +65,14 @@ class User:
         
         Thank you.
 
-        Bumpbot
+        WeBump!
         """.format(url=url, username=self.username, password=password, token=self.cf.encrypt(password))
 
         b = self.browser
         
         b.visit("https://forum.lowyat.net/index.php?act=Msg&CODE=04")
         b.fill('entered_name', self.username)
-        b.fill('msg_title', 'bump bot verification')
+        b.fill('msg_title', 'WeBump! credentials')
         b.fill('Post', body)
 
         submitbtn = b.find_by_name("submit")
