@@ -48,6 +48,8 @@ def register():
         u = User(username)
 
         if u.newUser:
+            u.add()
+            
             url_root = request.url_root
             log("baseURL is {}".format(url_root))
             t = multiprocessing.Process(target=u.sendCode, args=(url_root,))
