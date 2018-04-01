@@ -80,12 +80,8 @@ class Bump:
             success = False
             try:
                 self.visit("{}{}".format(self.topic_url, row.post_id))
-                # self.scrollDown()
-                # self.browser.fill('Post', 'bump!')
-                # submit_button = self.browser.find_by_name('submit')
-                # submit_button.click()
-
-                # links = self.browser.find_by_tag('a')
+                
+                links = self.browser.find_by_tag('a')
 
                 for bump_link in links:
                     if bump_link['alt'] == "Bump Topic":
@@ -105,6 +101,11 @@ class Bump:
             if not success:
                 log("Failed to bump post {post}".format(row.post_id))
                 
+    def comment(self, msg):
+        self.browser.fill('Post', 'bump!')
+        submit_button = self.browser.find_by_name('submit')
+        submit_button.click()
+
 
 if __name__ == "__main__":
     bump = Bump()
