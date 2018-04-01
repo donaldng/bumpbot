@@ -46,8 +46,11 @@ def register():
         username = request.form['register_username']
         u = User(username)
 
-        if u.newUser:
+        validUsername = u.validUser()
+
+        if u.newUser and validUsername:
             u.add()
+
             log("Adding new user {}".format(username))
             
             url_root = request.url_root
@@ -56,6 +59,9 @@ def register():
 
             msg = 'We have successfully sent you a code. Please check your LYN inbox!'
             category = "primary"
+        elif not validUsername:
+            msg = '{} is NOT a valid lowyat.net user.'.format(username)
+            category = "danger"            
         else:
             msg = '{} is already a registered user.'.format(username)
             category = "warning"

@@ -1,3 +1,4 @@
+from requests_html import HTMLSession
 import sqlite3, records
 from splinter import Browser
 from util.encryption import CryptoFernet
@@ -104,9 +105,29 @@ class User:
 
 
     def add(self):
-        if not self.registered():
+        if self.validUser() and not self.registered():
             encrypted_password = self.cf.encrypt(self.password)
             self.db.query('INSERT INTO user (username, password, created_at) VALUES ("{un}", "{ps}", datetime("now"))'.format(un=self.username.lower(), ps=encrypted_password))        
+
+    def validUser(self):
+        status = False
+        username = self.username
+        url = "https://forum.lowyat.net/user/{}".format(username)
+
+        log("validating new username {}".format(username))
+        session = HTMLSession()
+        r = session.get(url)
+
+        body = r.html
+
+        profileName = body.find("#profilename", first=True).text
+        try:
+            if self.username.lower() == profileName.lower():
+                status = True
+        except:
+            status = False
+
+        return status
 
     def getPassword(self):
         password = self.db.query("SELECT password FROM user WHERE LOWER(username) = '{}'".format(self.username.lower()))[0].password
