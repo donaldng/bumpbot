@@ -77,12 +77,34 @@ class Bump:
 
     def bumps(self):
         for row in self.posts:
-            self.visit("{}{}".format(self.topic_url, row.post_id))
-            self.scrollDown()
-            self.browser.fill('Post', 'bump!')
-            submit_button = self.browser.find_by_name('submit')
-            submit_button.click()
-            self.updateBumpCount()
+            success = False
+            try:
+                self.visit("{}{}".format(self.topic_url, row.post_id))
+                # self.scrollDown()
+                # self.browser.fill('Post', 'bump!')
+                # submit_button = self.browser.find_by_name('submit')
+                # submit_button.click()
+
+                # links = self.browser.find_by_tag('a')
+
+                for bump_link in links:
+                    if bump_link['alt'] == "Bump Topic":
+                        log("Found bump link.")
+                        bump_link.click()
+                        
+                        if not self.browser.is_text_present("You can only bump this thread tomorrow.") and not self.browser.is_text_present("Sorry, an error occurred."):
+                            self.updateBumpCount()
+                            log("Successfully bumped for post {post}!".format(row.post_id))
+                            success = True
+
+                        break
+
+            except:
+                log("Failed to bump post {post}".format(row.post_id))
+            
+            if not success:
+                log("Failed to bump post {post}".format(row.post_id))
+                
 
 if __name__ == "__main__":
     bump = Bump()
