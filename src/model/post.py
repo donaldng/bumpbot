@@ -46,7 +46,7 @@ class Post:
         log("post_owner is {}".format(post_owner))
 
         if post_owner.lower() == self.requestor.lower():
-            self.db.query("UPDATE post SET deleted=1 AND status=0 WHERE post_id=:post_id", False, post_id=post_id)
+            self.db.query("UPDATE post SET deleted=1, status=0 WHERE post_id=:post_id", False, post_id=post_id)
             log("deleted")
 
     def updateStatus(self, post_id, status):
