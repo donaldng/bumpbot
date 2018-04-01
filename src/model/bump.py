@@ -76,11 +76,11 @@ class Bump:
 
         return password
 
-    def updateBumpCount(self):
-        self.db.query("UPDATE post SET count = count + 1, last_bump={t}, updated_at={t}, next_execution=0".format(t=int(time.time())))
+    def updateBumpCount(self, post_id):
+        self.db.query("UPDATE post SET count = count + 1, last_bump={t}, updated_at={t}, next_execution=0 WHERE post_id={post_id}".format(t=int(time.time()), post_id=, post_id))
 
-    def bumpSchedule2Zero(self):
-        self.db.query("UPDATE post SET updated_at={t}, next_execution=0".format(t=int(time.time())))
+    def bumpSchedule2Zero(self, post_id):
+        self.db.query("UPDATE post SET updated_at={t}, next_execution=0 WHERE post_id={post_id}".format(t=int(time.time()), post_id=, post_id))
 
     def bumps(self):
         for row in self.posts:
@@ -98,13 +98,13 @@ class Bump:
                         bump_link.click()
 
                         if not self.browser.is_text_present("You can only bump this thread tomorrow.") and not self.browser.is_text_present("Sorry, an error occurred."):
-                            self.updateBumpCount()
+                            self.updateBumpCount(row.post_id)
                             log("Successfully bumped for post {post}!".format(post=row.post_id))
                             success = True
 
                         if self.browser.is_text_present("You can only bump this thread tomorrow.") and self.browser.is_text_present("Sorry, an error occurred."):
                             log("Error: Already bumped today.")
-                            self.bumpSchedule2Zero()
+                            self.bumpSchedule2Zero(row.post_id)
                             success = True
 
                         break
