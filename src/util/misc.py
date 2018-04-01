@@ -8,5 +8,5 @@ def time2date(ts):
 def log(msg):
     print(msg)
     fh = open("error.log", "a")
-    fh.write(msg)
+    fh.write("{}\n".format(msg))
     fh.close
