@@ -20,6 +20,9 @@ class Bump:
         now_time = int(time.time())
         self.posts = self.db.query("SELECT post_id FROM post WHERE status=1 AND {now_time} > next_execution AND next_execution != 0;".format(now_time=now_time))
         
+        print("SELECT post_id FROM post WHERE status=1 AND {now_time} > next_execution AND next_execution != 0;".format(now_time=now_time))
+        print(self.posts.all())
+        
         if len(self.posts.all()) > 0:
             with Browser('firefox', headless=True) as self.browser:
                 
@@ -79,27 +82,29 @@ class Bump:
         for row in self.posts:
             success = False
             try:
+                log("visit {}{}".format(self.topic_url, row.post_id))
                 self.visit("{}{}".format(self.topic_url, row.post_id))
                 
                 links = self.browser.find_by_tag('a')
 
                 for bump_link in links:
+                    print("alt = {}".format(bump_link["alt"]))
                     if bump_link['alt'] == "Bump Topic":
                         log("Found bump link.")
                         bump_link.click()
                         
                         if not self.browser.is_text_present("You can only bump this thread tomorrow.") and not self.browser.is_text_present("Sorry, an error occurred."):
                             self.updateBumpCount()
-                            log("Successfully bumped for post {post}!".format(row.post_id))
+                            log("Successfully bumped for post {post}!".format(post=row.post_id))
                             success = True
 
                         break
 
             except:
-                log("Failed to bump post {post}".format(row.post_id))
+                log("Failed to bump post {post}".format(post=row.post_id))
             
             if not success:
-                log("Failed to bump post {post}".format(row.post_id))
+                log("Failed to bump post {post}".format(post=row.post_id))
                 
     def comment(self, msg):
         self.browser.fill('Post', 'bump!')
