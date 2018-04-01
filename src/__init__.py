@@ -224,14 +224,12 @@ def logout():
 
 @app.template_filter('time2date')
 def time2date(timestampp):
-    log("timestamp is..... {}".format(timestampp))
 
     try:
         result = datetime.datetime.fromtimestamp(int(timestampp)).strftime('%Y-%m-%d %H:%M:%S')
     except:
-        result = 123
+        log("Unable to convert {}".format(timestampp))
 
-    log(result)
     return result
 
 if __name__ == '__main__':
