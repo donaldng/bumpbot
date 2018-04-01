@@ -86,7 +86,8 @@ class Bump:
                 self.visit("{}{}".format(self.topic_url, row.post_id))
                 
                 links = self.browser.find_by_tag('a')
-                print("{} links found.".format( len(links) )
+
+                print("{} links found.".format(len(links)))
 
                 for bump_link in links:
                     print("alt = {}".format(bump_link["alt"]))
