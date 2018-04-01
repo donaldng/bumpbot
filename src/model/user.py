@@ -3,7 +3,7 @@ from splinter import Browser
 from util.encryption import CryptoFernet
 from util.passwordGenerator import password_generator
 from environment.config import *
-from util.misc import maskPassword, log
+from util.misc import maskPassword, log, firefoxRunning
 import time
 
 class User:
@@ -41,6 +41,12 @@ class User:
 
     def sendCode(self, url):
 
+        counter = 0
+        while(firefoxRunning() and counter < 10):
+            time.sleep(10)
+            counter += 1
+            log("firefox is running... sleep(10) x {}".format(counter))
+        
         with Browser('firefox', headless=True) as self.browser:
             self.login()
             self.sendMsg(url)

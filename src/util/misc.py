@@ -10,3 +10,7 @@ def log(msg):
     fh = open("error.log", "a")
     fh.write("{}\n".format(msg))
     fh.close
+
+def firefoxRunning():
+    import psutil
+    return "firefox" in (p.name() for p in psutil.process_iter())

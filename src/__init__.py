@@ -6,7 +6,7 @@ import sqlite3, records
 import datetime
 from environment.config import *
 from util.encryption import CryptoFernet
-from util.misc import log
+from util.misc import log, firefoxRunning
 import os
 
 app = Flask(__name__)
@@ -26,7 +26,6 @@ def index():
             
             post = Post(session["username"])
             limit = post.limit
-
             posts = post.get(user_id=session['user_id'])
 
             disableAddBtn = False
@@ -52,7 +51,6 @@ def register():
             log("Adding new user {}".format(username))
             
             url_root = request.url_root
-            log("baseURL is {}".format(url_root))
             t = multiprocessing.Process(target=u.sendCode, args=(url_root,))
             t.start()
 
