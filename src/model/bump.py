@@ -93,10 +93,14 @@ class Bump:
                     if bump_link['alt'] == "Bump Topic":
                         log("Found bump link.")
                         bump_link.click()
-                        
+
                         if not self.browser.is_text_present("You can only bump this thread tomorrow.") and not self.browser.is_text_present("Sorry, an error occurred."):
                             self.updateBumpCount()
                             log("Successfully bumped for post {post}!".format(post=row.post_id))
+                            success = True
+
+                        if self.browser.is_text_present("You can only bump this thread tomorrow.") and self.browser.is_text_present("Sorry, an error occurred."):
+                            log("Error: Already bumped today.")
                             success = True
 
                         break
@@ -106,6 +110,12 @@ class Bump:
             
             if not success:
                 log("Failed to bump post {post}".format(post=row.post_id))
+            
+            try:
+                self.browser.driver.save_screenshot('{}picture.png'.format(app_src_path))
+                log("screenshoted")
+            except:
+                log("Cannot screenshot")
                 
     def comment(self, msg):
         self.browser.fill('Post', 'bump!')
