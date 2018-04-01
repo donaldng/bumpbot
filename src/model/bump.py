@@ -85,12 +85,11 @@ class Bump:
             try:
                 self.visit("{}{}".format(self.topic_url, row.post_id))
                 
-                links = self.browser.find_by_tag('a')
+                links = self.browser.find_by_tag('img')
 
                 print("{} links found.".format(len(links)))
 
                 for bump_link in links:
-                    print("alt = {}".format(bump_link["alt"]))
                     if bump_link['alt'] == "Bump Topic":
                         log("Found bump link.")
                         bump_link.click()
