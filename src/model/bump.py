@@ -79,6 +79,9 @@ class Bump:
     def updateBumpCount(self):
         self.db.query("UPDATE post SET count = count + 1, last_bump={t}, updated_at={t}, next_execution=0".format(t=int(time.time())))
 
+    def bumpSchedule2Zero(self):
+        self.db.query("UPDATE post SET updated_at={t}, next_execution=0".format(t=int(time.time())))
+
     def bumps(self):
         for row in self.posts:
             success = False
@@ -101,6 +104,7 @@ class Bump:
 
                         if self.browser.is_text_present("You can only bump this thread tomorrow.") and self.browser.is_text_present("Sorry, an error occurred."):
                             log("Error: Already bumped today.")
+                            self.bumpSchedule2Zero()
                             success = True
 
                         break
@@ -112,10 +116,10 @@ class Bump:
                 log("Failed to bump post {post}".format(post=row.post_id))
             
             try:
-                self.browser.driver.save_screenshot('{}picture.png'.format(app_src_path))
-                log("screenshoted")
+                self.browser.driver.save_screenshot('{}{}.png'.format(app_src_path, row.post_id))
+                log("screenshoted post {} bump result".format(row.post_id))
             except:
-                log("Cannot screenshot")
+                log("Failed to capture screenshot for post {}".format(row.post_id))
                 
     def comment(self, msg):
         self.browser.fill('Post', 'bump!')
