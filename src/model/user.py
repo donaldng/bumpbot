@@ -120,12 +120,18 @@ class User:
 
         body = r.html
 
-        profileName = body.find("#profilename", first=True).text
+        try:
+            profileName = body.find("#profilename", first=True).text
+        except:
+            log("Cannot find #profilename tag")
+
         try:
             if self.username.lower() == profileName.lower():
                 status = True
+                log("Username {} is valid".format(username))
         except:
             status = False
+            log("Username {} is invalid".format(username))
 
         return status
 
