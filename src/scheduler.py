@@ -6,12 +6,13 @@ from util.misc import time2date, log
 from environment.config import *
 import os
 
-def randomNextExecution():
+def randomNextExecution(premium=0):
     # set next run time within 0900~1800
     now = datetime.datetime.now()
 
-    start = int(datetime.datetime(now.year, now.month, now.day, 9, 0).timestamp())
-    end = int(datetime.datetime(now.year, now.month, now.day, 18, 0).timestamp())
+    start = int(datetime.datetime(now.year, now.month, now.day, 10, 0).timestamp())
+    end = int(datetime.datetime(now.year, now.month, now.day, 15, 0).timestamp())
+
     return randint(start, end)
 
 def scheduler(post_id=None):
@@ -26,6 +27,8 @@ def scheduler(post_id=None):
     posts = scheduler.db.query("SELECT * FROM post WHERE status=1 {extra}".format(extra=cond))
 
     for post in posts:
+        if post.account_id == 1:
+
         next_execution = randomNextExecution()
         log("update post_id {}".format(post.post_id))
         scheduler.db.query("UPDATE post SET next_execution=:next_execution WHERE user_id=:user_id and post_id=:post_id AND status=1;", False, next_execution=next_execution, user_id=post.user_id, post_id=post.post_id)

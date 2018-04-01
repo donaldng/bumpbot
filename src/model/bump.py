@@ -77,10 +77,10 @@ class Bump:
         return password
 
     def updateBumpCount(self, post_id):
-        self.db.query("UPDATE post SET count = count + 1, last_bump={t}, updated_at={t}, next_execution=0 WHERE post_id={post_id}".format(t=int(time.time()), post_id=, post_id))
+        self.db.query("UPDATE post SET count = count + 1, last_bump={t}, updated_at={t}, next_execution=0 WHERE post_id={post_id}".format(t=int(time.time()), post_id=post_id))
 
     def bumpSchedule2Zero(self, post_id):
-        self.db.query("UPDATE post SET updated_at={t}, next_execution=0 WHERE post_id={post_id}".format(t=int(time.time()), post_id=, post_id))
+        self.db.query("UPDATE post SET updated_at={t}, next_execution=0 WHERE post_id={post_id}".format(t=int(time.time()), post_id=post_id))
 
     def bumps(self):
         for row in self.posts:
