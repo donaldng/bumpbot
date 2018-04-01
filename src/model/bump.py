@@ -22,7 +22,7 @@ class Bump:
         
         print("SELECT post_id FROM post WHERE status=1 AND {now_time} > next_execution AND next_execution != 0;".format(now_time=now_time))
         print(self.posts.all())
-        
+
         if len(self.posts.all()) > 0:
             with Browser('firefox', headless=True) as self.browser:
                 
@@ -31,9 +31,11 @@ class Bump:
                 
                 if self.logged_in():
                     self.bumps()
-                    self.logout()
+                
+                self.logout()
 
     def logged_in(self):
+        log("Logged in!")
         return self.browser.is_text_present(self.username)
 
     def visit(self, url):
@@ -56,7 +58,6 @@ class Bump:
 
         button = self.browser.find_by_css('.button')
         button.click()
-        log("We in!")
 
     def logout(self):
         logout_link = self.browser.find_by_text('Log out')
@@ -82,10 +83,10 @@ class Bump:
         for row in self.posts:
             success = False
             try:
-                log("visit {}{}".format(self.topic_url, row.post_id))
                 self.visit("{}{}".format(self.topic_url, row.post_id))
                 
                 links = self.browser.find_by_tag('a')
+                print("{} links found.".format( len(links) )
 
                 for bump_link in links:
                     print("alt = {}".format(bump_link["alt"]))
