@@ -1,3 +1,4 @@
+from requests_html import HTMLSession
 from environment.config import *
 from util.misc import log
 from splinter import Browser
@@ -86,15 +87,20 @@ class Post:
 
 
     def getPostInfo(self, post_id):
-        with Browser('firefox', headless=True) as browser:
-            url = "{}{}".format(self.topic_url, post_id)
-            log("visit {}".format(url))
-            browser.visit(url)
+        log("get post info of post_id {}".format(post_id))
+        session = HTMLSession()
 
-            topicTitle = browser.title
-            topicOwner = browser.find_by_css(".normalname a").first["text"]
+        url = "{}{}".format(self.topic_url, post_id)
+        r = session.get(url)
 
-            return topicTitle, topicOwner
+        body = r.html
+
+        topic_owner = body.find("span.normalname", first=True).text
+        title = body.find("title", first=True).text
+
+        log("topic owner={};title={}".format(topic_owner, title))
+
+        return title, topic_owner
 
 
 if __name__ == "__main__":
