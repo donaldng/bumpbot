@@ -18,9 +18,9 @@ class Bump:
 
     def start(self):
         now_time = int(time.time())
-        self.posts = self.db.query("SELECT post_id FROM post WHERE status=1 AND {now_time} > next_execution AND next_execution != 0;".format(now_time=now_time))
+        self.posts = self.db.query("SELECT post_id, user_id FROM post WHERE status=1 AND {now_time} > next_execution AND next_execution != 0;".format(now_time=now_time))
         
-        print("SELECT post_id FROM post WHERE status=1 AND {now_time} > next_execution AND next_execution != 0;".format(now_time=now_time))
+        print("SELECT post_id, user_id FROM post WHERE status=1 AND {now_time} > next_execution AND next_execution != 0;".format(now_time=now_time))
         print(self.posts.all())
 
         if len(self.posts.all()) > 0:
@@ -84,35 +84,45 @@ class Bump:
 
     def bumps(self):
         for row in self.posts:
-            success = False
+            post_success = False
             try:
                 self.visit("{}{}".format(self.topic_url, row.post_id))
-                
-                links = self.browser.find_by_tag('img')
 
                 print("{} links found.".format(len(links)))
 
-                for bump_link in links:
-                    if bump_link['alt'] == "Bump Topic":
-                        log("Found bump link.")
-                        bump_link.click()
+                if row.user_id == 1:
+                    links = self.browser.find_by_tag('img')
 
-                        if not self.browser.is_text_present("You can only bump this thread tomorrow.") and not self.browser.is_text_present("Sorry, an error occurred."):
-                            self.updateBumpCount(row.post_id)
-                            log("Successfully bumped for post {post}!".format(post=row.post_id))
-                            success = True
+                    for bump_link in links:
+                        if bump_link['alt'] == "Bump Topic":
+                            log("Found bump link.")
 
-                        if self.browser.is_text_present("You can only bump this thread tomorrow.") and self.browser.is_text_present("Sorry, an error occurred."):
-                            log("Error: Already bumped today.")
-                            self.bumpSchedule2Zero(row.post_id)
-                            success = True
+                            # click bump link if is owner, otherwise just comment bump.
+                            if row.user_id == 1:
+                                bump_link.click()
+                                
 
-                        break
+                            if not self.browser.is_text_present("You can only bump this thread tomorrow.") and not self.browser.is_text_present("Sorry, an error occurred."):
+                                self.updateBumpCount(row.post_id)
+                                log("Successfully bumped for post {post}!".format(post=row.post_id))
+                                post_success = True
+
+                            if self.browser.is_text_present("You can only bump this thread tomorrow.") and self.browser.is_text_present("Sorry, an error occurred."):
+                                log("Error: Already bumped today.")
+                                self.bumpSchedule2Zero(row.post_id)
+                                post_success = True
+
+                            break                    
+                else:
+                    self.comment("Bump")
+                    post_success = True
+                    log("Successfully written bumps on post {}".format(row.post_id))
+                    
 
             except:
                 log("Failed to bump post {post}".format(post=row.post_id))
             
-            if not success:
+            if not post_success:
                 log("Failed to bump post {post}".format(post=row.post_id))
             
             try:
@@ -122,7 +132,7 @@ class Bump:
                 log("Failed to capture screenshot for post {}".format(row.post_id))
                 
     def comment(self, msg):
-        self.browser.fill('Post', 'bump!')
+        self.browser.fill('Post', msg)
         submit_button = self.browser.find_by_name('submit')
         submit_button.click()
 
